@@ -1,0 +1,28 @@
+{
+  "name": "floating-wallet",
+  "version": "0.0.1",
+  "description": "floating wallet by development",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bsangs/floating-wallet.git"
+  },
+  "keywords": [
+    "crypto",
+    "wallet",
+    "ethereum",
+    "evm"
+  ],
+  "author": "bsangs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bsangs/floating-wallet/issues"
+  },
+  "homepage": "https://github.com/bsangs/floating-wallet#readme",
+  "dependencies": {
+    "ethers": "^5.6.9"
+  }
+}
