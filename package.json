@@ -2,7 +2,9 @@
   "name": "floating-wallet",
   "version": "0.0.2",
   "description": "floating wallet by development",
-  "main": "src/index.js",
+  "bin": {
+    "floating-wallet": "src/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "patpublish": "npm version patch && npm publish"
@@ -24,7 +26,6 @@
   },
   "homepage": "https://github.com/bsangs/floating-wallet#readme",
   "dependencies": {
-    "ethers": "^5.6.9",
-    "ts-node": "^10.9.1"
+    "ethers": "^5.6.9"
   }
 }
