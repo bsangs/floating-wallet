@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "description": "floating wallet by development",
   "bin": {
-    "floating-wallet": "src/index.js"
+    "floating-wallet": "src/index"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
