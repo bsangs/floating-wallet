@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/bsangs/floating-wallet#readme",
   "dependencies": {
-    "ethers": "^5.6.9"
+    "ethers": "^5.6.9",
+    "ts-node": "^10.9.1"
   }
 }
