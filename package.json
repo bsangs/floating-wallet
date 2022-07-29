@@ -1,6 +1,6 @@
 {
   "name": "floating-wallet",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "floating wallet by development",
   "bin": {
     "floating-wallet": "src/index.js"
