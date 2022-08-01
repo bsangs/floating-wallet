@@ -5,6 +5,7 @@ const privateKeyFile = `${file_dir}/private-keys.json`;
 const networksFile = `${file_dir}/networks.json`;
 const addressesFile = `${file_dir}/to-addresses.json`;
 const historiesFile = `${file_dir}/histories.json`;
+const selectedFile = `${file_dir}/selected-options.json`;
 
 function prepareFileIO(filename) {
   // if file not exists, make file
@@ -40,6 +41,7 @@ exports.loadDatas = () => {
     networks: loadJsonFile(networksFile),
     toAddresses: loadJsonFile(addressesFile),
     histories: loadJsonFile(historiesFile),
+    selected: loadJsonFile(selectedFile),
   };
 };
 
@@ -48,4 +50,5 @@ exports.saveDatas = (datas) => {
   saveJsonFile(networksFile, datas.networks);
   saveJsonFile(addressesFile, datas.toAddresses);
   saveJsonFile(historiesFile, datas.histories);
+  saveJsonFile(selectedFile, datas.selected)
 };
