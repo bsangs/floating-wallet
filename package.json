@@ -3,8 +3,9 @@
   "version": "0.0.4",
   "description": "floating wallet by development",
   "bin": {
-    "floating-wallet": "src/index"
+    "fw": "./bin/index.js"
   },
+  "preferGlobal": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "patpublish": "npm version patch && npm publish"
