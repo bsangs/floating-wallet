@@ -37,9 +37,9 @@ function saveJsonFile(filename, jsonData) {
 exports.loadDatas = () => {
   return {
     privateKeys: loadJsonFile(privateKeyFile),
-    networks: loadNetworks(networksFile),
-    toAddresses: loadToAddresses(addressesFile),
-    histories: loadHistories(historiesFile),
+    networks: loadJsonFile(networksFile),
+    toAddresses: loadJsonFile(addressesFile),
+    histories: loadJsonFile(historiesFile),
   };
 };
 

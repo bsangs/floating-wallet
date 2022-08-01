@@ -1,5 +1,8 @@
 #! /usr/bin/env node
-
-const { loadDatas } = require("./utils/loadData");
+const process = require("process");
+const { loadDatas, saveDatas } = require("./utils/loadData");
 
 let userData = loadDatas();
+const argv = process.argv.slice(2);
+
+console.log(argv, userData);
