@@ -7,6 +7,20 @@ async function isValidRPCURL(RPC_URL) {
     } catch (e) {
         return false;
     }
+
+    ethers.ethers.Wallet.createRandom()
+}
+
+function checksumAddress(address) {
+    return ethers.utils.getAddress(address);
+}
+
+function checksumPrivateKey(privateKey) {
+    const wallet = new ethers.Wallet(privateKey);
+
+    return wallet.privateKey;
 }
 
 exports.isValidRPCURL = isValidRPCURL;
+exports.checksumAddress = checksumAddress;
+exports.checksumPrivateKey = checksumPrivateKey;

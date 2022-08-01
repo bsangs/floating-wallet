@@ -2,72 +2,48 @@ const prompt = require("prompt-sync")();
 
 const {
     selectPrompt,
-    selectOption,
     printOptions,
-    printSubOptions,
-    existKeyName
+    subConfig
 } = require("../utils/configUtils");
 
-const { isValidRPCURL } = require("../utils/ethersUtils");
+const {
+    isValidRPCURL,
+    checksumAddress,
+    checksumPrivateKey
+} = require("../utils/ethersUtils");
 
 const { saveDatas } = require("../utils/loadData");
 
-async function networkConfig(userData) {
-    printOptions('select network options', [
-        "set network",
-        "add network",
-        "remove network",
-        "view networks"
-    ])
-
-    switch (selectPrompt()) {
-        case 1:
-            printSubOptions("network", userData['networks'], ``);
-            selectOption('network', userData, Object.keys(userData['networks']).length);
-            break;
-        case 2:
-            const networkName = prompt("input network name: ");
-
-            if(existKeyName(networkName, userData['networks'])) {
-                console.log("this network name is exists.");
-                return;
-            }
-
-            const rpcURL = prompt("input RPC URL: ");
-            if(!(await isValidRPCURL(rpcURL))) {
-                console.log("Invalid RPC URL");
-                return;
-            }
-
-            userData['networks'][networkName] = { rpcURL };
-
-            console.log("successfully add network.");
-            break;
-        case 3:
-            const keys = Object.keys(userData['networks']);
-
-            printSubOptions("network", userData['networks'], ``);
-
-            const number = Number(prompt("input network number: "));
-
-            if(number - 1 > keys.length && number <= 0) {
-                console.log("Input number is invalid.");
-                return true;
-            }
-
-            delete userData['networks'][keys[number - 1]];
-
-            console.log("successfully delete network");
-            break;
-        case 4:
-            printSubOptions('network', userData['networks'], ``);
-            prompt("press enter...",{echo: ''});
-            break;
+async function networkAddCallback(userData) {
+    const rpcURL = prompt("input RPC URL: ");
+    if(!(await isValidRPCURL(rpcURL))) {
+        console.log("Invalid RPC URL");
+        return -1;
     }
+
+    return { rpcURL };
 }
 
-function privateKeyConfig() {
-    console.log("yeyeye")
+async function privateKeyAddCallback(userData) {
+    const privateKey = prompt("input private key: ");
+
+    if(!(privateKey.length === 66 && privateKey.startsWith("0x")) && privateKey.length !== 64) {
+        console.log("Invalid private key");
+        return -1;
+    }
+
+    return { privateKey: checksumPrivateKey(privateKey) };
+}
+
+async function toAddressAddCallback(userData) {
+    const address = prompt("input address: ");
+
+    if(!(address.length === 42 && address.startsWith("0x")) && address.length !== 40) {
+        console.log("Invalid address");
+        return -1;
+    }
+
+    return { address: checksumAddress(address) };
 }
 
 exports.config = async(userData) => {
@@ -82,10 +58,13 @@ exports.config = async(userData) => {
 
         switch (selectPrompt()) {
             case 1:
-                await networkConfig(userData);
+                await subConfig(userData, 'network', 'networks', networkAddCallback);
                 break;
             case 2:
-                privateKeyConfig(userData);
+                await subConfig(userData, 'privateKey', 'privateKeys', privateKeyAddCallback);
+                break;
+            case 3:
+                await subConfig(userData, 'receive address', 'toAddresses', toAddressAddCallback);
                 break;
             default:
                 console.log("Exit config.");
