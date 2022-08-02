@@ -6,6 +6,7 @@ const networksFile = `${file_dir}/networks.json`;
 const addressesFile = `${file_dir}/to-addresses.json`;
 const historiesFile = `${file_dir}/histories.json`;
 const selectedFile = `${file_dir}/selected-options.json`;
+const contractFile = `${file_dir}/contracts.json`;
 
 function prepareFileIO(filename) {
   // if file not exists, make file
@@ -42,6 +43,7 @@ exports.loadDatas = () => {
     toAddresses: loadJsonFile(addressesFile),
     histories: loadJsonFile(historiesFile),
     selected: loadJsonFile(selectedFile),
+    contracts: loadJsonFile(contractFile)
   };
 };
 
@@ -50,5 +52,6 @@ exports.saveDatas = (datas) => {
   saveJsonFile(networksFile, datas.networks);
   saveJsonFile(addressesFile, datas.toAddresses);
   saveJsonFile(historiesFile, datas.histories);
-  saveJsonFile(selectedFile, datas.selected)
+  saveJsonFile(selectedFile, datas.selected);
+  saveJsonFile(contractFile, datas.contracts);
 };

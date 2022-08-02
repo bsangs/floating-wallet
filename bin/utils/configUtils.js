@@ -1,4 +1,12 @@
 const prompt = require("prompt-sync")({sigint: false});
+const {
+    setSelectOption,
+    getSelectedNumber
+} = require("./selected");
+
+function pressEnter() {
+    prompt("press enter...");
+}
 
 function selectPrompt() {
     return Number(prompt("select option: "));
@@ -6,42 +14,45 @@ function selectPrompt() {
 
 function selectOption(optionName, userData, limit = -1) {
     const selected = selectPrompt();
-    if (limit != -1 && selected > limit) {
+    if (limit !== -1 && selected > limit) {
         console.log("Input number is invalid.");
+        pressEnter();
         return;
     }
 
-    userData['selected'] = {
-        ...userData['selected'],
-        [optionName]: selected
-    }
+    setSelectOption(userData, optionName, selected);
 
     console.log("successfully!");
+    pressEnter();
 }
 
-function printOptions(title, options, description = undefined) {
+function printOptions(title, options) {
     // console.clear();
     console.log('');
 
     if(typeof title === "string" && title.length > 0) console.log(`[${title}]`);
 
-    if(typeof description === "string" && description.length > 0) console.log(description);
+    // if(typeof description === "string" && description.length > 0) console.log(description);
 
     options.forEach((option, i) => {
-        console.log(`  ${i + 1}. ${option}`)
+        console.log(`  ${i + 1}. ${option}`);
     })
     console.log('');
 }
 
-function printSubOptions(optionName, optionObj, description = undefined) {
-    if(Object.keys(optionObj).length == 0) {
+function printSubOptions(optionName, optionObj, selected = 0) {
+    if(Object.keys(optionObj).length === 0) {
         console.log(`${optionName} is empty.`);
+        pressEnter();
         return;
     }
 
-    const data = Object.keys(optionObj).map((key) => `${key}:\n      ${JSON.stringify(optionObj[key])}`);
+    const data = Object.keys(optionObj).map(
+        (key, idx) =>
+            `${key}: ${(selected - 1 === idx) ? "<== SELECTED" : ""}\n      ${JSON.stringify(optionObj[key])}`
+    );
 
-    printOptions(`select ${optionName}`, data, description);
+    printOptions(`select ${optionName}`, data);
 }
 
 function existKeyName(key, data) {
@@ -55,17 +66,20 @@ async function subConfig(userData, name, userDataKeyword, addCallback) {
         `set ${name}`,
         `add ${name}`,
         `remove ${name}`,
-        `view ${name}s`
+        `view ${name}`
     ])
+
+    const selected = getSelectedNumber(userData, name);
 
     switch (selectPrompt()) {
         case 1:
             if(keys.length === 0) {
                 console.log(`${name} is empty data.`);
+                pressEnter();
                 return;
             }
 
-            printSubOptions(name, userData[userDataKeyword], ``);
+            printSubOptions(name, userData[userDataKeyword], selected);
             selectOption(name, userData, keys.length);
             break;
         case 2:
@@ -73,6 +87,7 @@ async function subConfig(userData, name, userDataKeyword, addCallback) {
 
             if(existKeyName(objName, userData[userDataKeyword])) {
                 console.log(`this ${name} name is exists.`);
+                pressEnter();
                 return;
             }
 
@@ -81,20 +96,23 @@ async function subConfig(userData, name, userDataKeyword, addCallback) {
             if(result === -1) return;
 
             userData[userDataKeyword][objName] = result;
-            console.log("successfully add network.");
+            console.log(`successfully add ${name}.`);
+            pressEnter();
             break;
         case 3:
             if(keys.length === 0) {
                 console.log(`${name} is empty data.`);
+                pressEnter();
                 return;
             }
 
-            printSubOptions(name, userData[userDataKeyword], ``);
+            printSubOptions(name, userData[userDataKeyword], selected);
 
             const number = Number(prompt(`input ${name} number: `));
 
             if(number - 1 > keys.length && number <= 0) {
                 console.log("Input number is invalid.");
+                pressEnter();
                 return true;
             }
 
@@ -108,7 +126,7 @@ async function subConfig(userData, name, userDataKeyword, addCallback) {
                 return;
             }
 
-            printSubOptions(name, userData[userDataKeyword], ``);
+            printSubOptions(name, userData[userDataKeyword], selected);
             prompt("press enter...",{echo: ''});
             break;
     }
@@ -120,3 +138,4 @@ exports.printOptions = printOptions;
 exports.printSubOptions = printSubOptions;
 exports.existKeyName = existKeyName;
 exports.subConfig = subConfig;
+exports.pressEnter = pressEnter;

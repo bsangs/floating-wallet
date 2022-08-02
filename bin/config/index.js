@@ -3,14 +3,25 @@ const prompt = require("prompt-sync")();
 const {
     selectPrompt,
     printOptions,
-    subConfig
+    subConfig,
+    pressEnter
 } = require("../utils/configUtils");
 
 const {
     isValidRPCURL,
     checksumAddress,
-    checksumPrivateKey
+    checksumPrivateKey,
+    getERC20Symbol,
+    getERC20Decimal
 } = require("../utils/ethersUtils");
+
+const {
+    getNetwork
+} = require("../utils/selected");
+
+const {
+    printHistories
+} = require("./histories");
 
 const { saveDatas } = require("../utils/loadData");
 
@@ -18,6 +29,7 @@ async function networkAddCallback(userData) {
     const rpcURL = prompt("input RPC URL: ");
     if(!(await isValidRPCURL(rpcURL))) {
         console.log("Invalid RPC URL");
+        pressEnter();
         return -1;
     }
 
@@ -29,6 +41,7 @@ async function privateKeyAddCallback(userData) {
 
     if(!(privateKey.length === 66 && privateKey.startsWith("0x")) && privateKey.length !== 64) {
         console.log("Invalid private key");
+        pressEnter();
         return -1;
     }
 
@@ -40,10 +53,46 @@ async function toAddressAddCallback(userData) {
 
     if(!(address.length === 42 && address.startsWith("0x")) && address.length !== 40) {
         console.log("Invalid address");
+        pressEnter();
         return -1;
     }
 
     return { address: checksumAddress(address) };
+}
+
+async function contractAddCallback(userData) {
+    const network = getNetwork(userData);
+
+    if (typeof network === "undefined") {
+        console.log("network is not selected!");
+        pressEnter();
+        return -1;
+    }
+
+    const addressObj = await toAddressAddCallback(userData);
+    if (addressObj === -1) return -1;
+
+    const RPC_URL = userData['networks'][network]['rpcURL'];
+
+    const contractAddress = addressObj.address;
+    const symbol = await getERC20Symbol(RPC_URL, contractAddress);
+    const decimals = await getERC20Decimal(RPC_URL, contractAddress);
+
+    if (
+        typeof symbol === "undefined" ||
+        typeof decimals === "undefined"
+    ) {
+        console.log("Check your network in RPC URL.");
+        pressEnter();
+        return -1;
+    }
+
+    return {
+        symbol,
+        contract: contractAddress,
+        decimals,
+        network
+    };
 }
 
 exports.config = async(userData) => {
@@ -52,6 +101,7 @@ exports.config = async(userData) => {
             "network settings",
             "private key settings",
             "receive address settings",
+            "ERC20 contracts settings",
             "view transaction histories",
             "exit config (or ^C)"
         ])
@@ -64,7 +114,13 @@ exports.config = async(userData) => {
                 await subConfig(userData, 'privateKey', 'privateKeys', privateKeyAddCallback);
                 break;
             case 3:
-                await subConfig(userData, 'receive address', 'toAddresses', toAddressAddCallback);
+                await subConfig(userData, 'receiveAddress', 'toAddresses', toAddressAddCallback);
+                break;
+            case 4:
+                await subConfig(userData, 'contractAddress', 'contracts', contractAddCallback);
+                break;
+            case 5:
+                printHistories(userData)
                 break;
             default:
                 console.log("Exit config.");
