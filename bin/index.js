@@ -11,6 +11,7 @@ const argv = process.argv.slice(2);
 switch (argv[0]) {
     case 'config':
         config(userData);
+        break;
     case 'send':
         send(userData, argv.slice(1));
         break;

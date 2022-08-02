@@ -12,7 +12,8 @@ const {
     checksumAddress,
     checksumPrivateKey,
     getERC20Symbol,
-    getERC20Decimal
+    getERC20Decimal,
+    privateKeyToAddress
 } = require("../utils/ethersUtils");
 
 const {
@@ -45,7 +46,12 @@ async function privateKeyAddCallback(userData) {
         return -1;
     }
 
-    return { privateKey: checksumPrivateKey(privateKey) };
+    const checksumResult = checksumPrivateKey(privateKey);
+
+    return {
+        address: privateKeyToAddress(checksumResult),
+        privateKey: checksumResult
+    };
 }
 
 async function toAddressAddCallback(userData) {
