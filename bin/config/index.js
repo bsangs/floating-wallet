@@ -1,11 +1,14 @@
 const prompt = require("prompt-sync")();
 
 const {
-    selectPrompt,
     printOptions,
-    subConfig,
-    pressEnter
+    subConfig
 } = require("../utils/configUtils");
+
+const {
+    selectPrompt,
+    pressEnter
+} = require("../utils/consoleUtils")
 
 const {
     isValidRPCURL,

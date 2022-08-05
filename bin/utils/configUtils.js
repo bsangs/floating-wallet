@@ -4,13 +4,10 @@ const {
     getSelectedNumber
 } = require("./selected");
 
-function pressEnter() {
-    prompt("press enter...");
-}
-
-function selectPrompt() {
-    return Number(prompt("select option: "));
-}
+const {
+    selectPrompt,
+    pressEnter
+} = require("./consoleUtils");
 
 function selectOption(optionName, userData, limit = -1) {
     const selected = selectPrompt();
@@ -132,10 +129,8 @@ async function subConfig(userData, name, userDataKeyword, addCallback) {
     }
 }
 
-exports.selectPrompt = selectPrompt;
 exports.selectOption = selectOption;
 exports.printOptions = printOptions;
 exports.printSubOptions = printSubOptions;
 exports.existKeyName = existKeyName;
 exports.subConfig = subConfig;
-exports.pressEnter = pressEnter;

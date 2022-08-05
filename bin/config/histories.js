@@ -1,7 +1,7 @@
 const process = require('process');
 const prompt = require("prompt-sync")();
 
-const { pressEnter } = require('../utils/configUtils');
+const { pressEnter } = require('../utils/consoleUtils');
 const { getNetwork } = require('../utils/selected');
 
 function nextPagePrompt(currentPage) {

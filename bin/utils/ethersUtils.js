@@ -12,13 +12,27 @@ async function isValidRPCURL(RPC_URL) {
     }
 }
 
+function toBN(num) {
+    return ethers.BigNumber.from(`${num}`);
+}
+
+function getWallet(rpcURL, privateKey) {
+    const provider = new ethers.providers.JsonRpcProvider(rpcURL);
+
+    return new ethers.Wallet(privateKey, provider);
+}
+
 function privateKeyToAddress(privateKey) {
     const wallet = new ethers.Wallet(privateKey);
     return wallet.address;
 }
 
 function checksumAddress(address) {
-    return ethers.utils.getAddress(address);
+    try {
+        return ethers.utils.getAddress(address);
+    } catch (e) {
+        return null;
+    }
 }
 
 function checksumPrivateKey(privateKey) {
@@ -49,7 +63,7 @@ async function getAmount(rpcURL, address, isContract = false, contractAddress = 
         let balance;
         let decimals = 18;
 
-        if (isContract && !contractAddress) {
+        if (isContract && contractAddress) {
             const contract = new ethers.Contract(contractAddress, ERC20_ABI, provider);
 
             // check array
@@ -65,27 +79,65 @@ async function getAmount(rpcURL, address, isContract = false, contractAddress = 
     }
 }
 
-async function estimateGasLimit(rpcURL, from, to, isContract = false, contractAddress = null) {
+async function estimateGasLimit(rpcURL, from, to, amount, privateKey, isContract = false, contractAddress = null) {
+    amount = `${amount}`;
+    try {
+        const provider = new ethers.providers.JsonRpcProvider(rpcURL);
+        const wallet = new ethers.Wallet(privateKey, provider);
+
+        if(isContract && contractAddress) {
+            const contract = new ethers.Contract(contractAddress, ERC20_ABI, wallet);
+            return (await contract.estimateGas.transfer(to, amount)).toNumber();
+        }
+        return (await wallet.estimateGas({
+            from,
+            to
+        })).toNumber()
+    } catch (e) {
+        console.error(e);
+        return -1;
+    }
+}
+
+async function getGasPrice(rpcURL) {
     try {
         const provider = new ethers.providers.JsonRpcProvider(rpcURL);
 
-        return await provider.estimateGas({
-            from,
-            to
-        })
+        return (await provider.getGasPrice()).toNumber();
     } catch (e) {
         return -1;
     }
 }
 
-async function transferNativeToken() {
-
+function weiToUnit(wei, unit) {
+    return Number(ethers.utils.formatUnits(wei, unit));
 }
 
-async function transferERC20Token() {
-    // const provider = new ethers.providers.JsonRpcProvider(rpcURL);
-    //
-    // const contract = new ethers.Contract(contractAddress, ERC20_ABI, provider);
+function weiToEther(wei) {
+    return Number(ethers.utils.formatEther(wei));
+}
+
+async function transferNativeToken(wallet, to, weiAmount, gasPrice, gasLimit) {
+    try {
+        return await wallet.sendTransaction({
+            to,
+            value: weiAmount,
+            gasPrice,
+            gasLimit
+        });
+    } catch (e) {
+        return e;
+    }
+}
+
+async function transferERC20Token(wallet, contractAddress, to, weiAmount, gasPrice, gasLimit) {
+    try {
+        const contract = new ethers.Contract(contractAddress, ERC20_ABI, wallet);
+
+        return await contract.functions.transfer(to, weiAmount);
+    } catch (e) {
+        return e;
+    }
 }
 
 exports.isValidRPCURL = isValidRPCURL;
@@ -94,5 +146,12 @@ exports.checksumPrivateKey = checksumPrivateKey;
 exports.getERC20Symbol = getERC20Symbol;
 exports.getERC20Decimal = getERC20Decimal;
 exports.getAmount = getAmount;
+exports.getWallet = getWallet;
 exports.privateKeyToAddress = privateKeyToAddress;
 exports.estimateGasLimit = estimateGasLimit;
+exports.getGasPrice = getGasPrice;
+exports.weiToUnit = weiToUnit;
+exports.weiToEther = weiToEther;
+exports.transferNativeToken = transferNativeToken;
+exports.transferERC20Token = transferERC20Token;
+exports.toBN = toBN;
