@@ -4,7 +4,8 @@ const {
 } = require('../utils/consoleUtils');
 
 const {
-    checksumAddress
+    checksumAddress,
+    getERC20Symbol
 } = require('../utils/ethersUtils');
 
 const {
@@ -14,7 +15,11 @@ const {
 const {
     sendERC20Token,
     sendNativeToken
-} = require('./send')
+} = require('./send');
+
+const {
+    saveDatas
+} = require('../utils/loadData')
 
 async function send(userData, argv) {
     const contractOptionIndex = argv.indexOf('-c');
@@ -72,19 +77,36 @@ async function send(userData, argv) {
 
     log.log("Sending transaction...");
 
-    // if (isContract) {
-    //     transactionResult = await sendERC20Token(validData);
-    // } else {
-    //     transactionResult = await sendNativeToken(validData);
-    // }
+    if (isContract) {
+        transactionResult = await sendERC20Token(validData);
+    } else {
+        transactionResult = await sendNativeToken(validData);
+    }
 
 
 
-    // if (transactionResult !== -1) {
-    //     console.log(transactionResult);
-    // } else {
-    //     console.log("Error")
-    // }
+    if (transactionResult !== -1) {
+        let symbol;
+        try {
+            symbol = await getERC20Symbol(validData.rpcURL, validData.contractAddress);
+        } catch (e) {
+            symbol = validData.network.key;
+        }
+
+        const history = {
+            hash: transactionResult.hash,
+            from: transactionResult.from,
+            to: transactionResult.to,
+            network: validData.network.key,
+            amount: amount,
+            contractAddress: validData.contractAddress,
+            symbol: symbol
+        }
+        userData.histories[history.hash] = history;
+        saveDatas(userData);
+    } else {
+        console.log("Error")
+    }
 }
 
 exports.send = send;

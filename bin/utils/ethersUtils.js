@@ -57,6 +57,14 @@ async function getERC20Decimal(rpcURL, contractAddress) {
     return (await contract.functions.decimals())[0];
 }
 
+async function getERC20Symbol(rpcURL, contractAddress) {
+    const provider = new ethers.providers.JsonRpcProvider(rpcURL);
+
+    const contract = new ethers.Contract(contractAddress, ERC20_ABI, provider);
+
+    return (await contract.functions.symbol())[0];
+}
+
 async function getAmount(rpcURL, address, isContract = false, contractAddress = null) {
     try {
         const provider = new ethers.providers.JsonRpcProvider(rpcURL);

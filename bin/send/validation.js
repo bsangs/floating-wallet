@@ -117,6 +117,7 @@ async function validationData(userData, amount, isContract = false, contractAddr
         gasPrice: toBN(gasPrice),
         gasLimit: toBN(gasLimit),
         contractAddress: (isContract) ? contractAddress : null,
+        network: network
     }
 }
 

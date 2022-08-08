@@ -4,8 +4,9 @@ const prompt = require("prompt-sync")();
 const { pressEnter } = require('../utils/consoleUtils');
 const { getNetwork } = require('../utils/selected');
 
-function nextPagePrompt(currentPage) {
-    return Number(prompt(`input page (exit: 0 or ^C, default ${currentPage + 1}): `, {value: currentPage + 1}));
+function nextPagePrompt(currentPage, isNextPage) {
+    const defualtValue = isNextPage ? currentPage + 1 : 'exit';
+    return Number(prompt(`input page (exit: 0 or ^C, default ${defualtValue}): `, {value: defualtValue}));
 }
 
 function printHistories(userData, defaultPage=1) {
@@ -14,6 +15,7 @@ function printHistories(userData, defaultPage=1) {
     const network = getNetwork(userData);
     const rows = process.stdout.rows;
     let page = defaultPage;
+    let isNextPage = false;
 
     if (typeof network === "undefined") {
         console.log("network is not selected!");
@@ -51,9 +53,10 @@ function printHistories(userData, defaultPage=1) {
             console.log(`  send ${value['amount']} ${value['symbol']}  to ${value['to'].slice(0, 10)}...`);
             console.log(`    - ${historyKeys[idx]}`);
         }
+        isNextPage = blankSize === 0;
 
         for (let j = 0; j < blankSize; j++) console.log('');
-    } while (page = nextPagePrompt(page));
+    } while (page = nextPagePrompt(page, isNextPage));
 }
 
 exports.printHistories = printHistories;
