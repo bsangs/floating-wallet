@@ -86,6 +86,10 @@ async function send(userData, argv) {
 
 
     if (transactionResult !== -1) {
+        const transactionHash = transactionResult.hash;
+
+        console.log(`transactionHash(TXID): ${transactionHash}`);
+
         let symbol;
         try {
             symbol = await getERC20Symbol(validData.rpcURL, validData.contractAddress);
@@ -103,6 +107,7 @@ async function send(userData, argv) {
             symbol: symbol
         }
         userData.histories[history.hash] = history;
+
         saveDatas(userData);
     } else {
         console.log("Error")
