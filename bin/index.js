@@ -4,6 +4,7 @@ const { loadDatas } = require("./utils/loadData");
 
 const { config } = require("./config");
 const { send } = require("./send");
+const { printHelpMessage } = require("./helper");
 
 const userData = loadDatas();
 const argv = process.argv.slice(2);
@@ -16,6 +17,9 @@ switch (argv[0]) {
         send(userData, argv.slice(1));
         break;
     case 'view':
+        break;
+    default:
+        printHelpMessage();
         break;
 }
 
